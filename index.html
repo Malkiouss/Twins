@@ -164,7 +164,10 @@
   ══════════════════════════════════════ -->
   <nav class="navbar" id="navbar">
     <a href="#" class="nav-logo">TWINS</a>
-    <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation"><i class="fas fa-bars"></i></button>
+    <div class="nav-right">
+      <button class="mobile-lang-toggle" id="mobileLangToggle" aria-label="Change language"><i class="fas fa-globe"></i></button>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation"><i class="fas fa-bars"></i></button>
+    </div>
     <ul class="nav-links" id="navLinks">
       <li><a href="#services" data-i18n="nav_services">Services</a></li>
       <li><a href="#about" data-i18n="nav_about">About</a></li>
@@ -173,6 +176,14 @@
       <li><a href="#faq" data-i18n="nav_faq">FAQ</a></li>
       <li><a href="#map" data-i18n="nav_map">Location</a></li>
     </ul>
+    <!-- Mobile Language Dropdown -->
+    <div class="mobile-lang-dropdown" id="mobileLangDropdown">
+      <button class="mobile-lang-btn active" data-lang="en">🇬🇧 English</button>
+      <button class="mobile-lang-btn" data-lang="fr">🇫🇷 Français</button>
+      <button class="mobile-lang-btn" data-lang="ar">🇲🇦 العربية</button>
+      <button class="mobile-lang-btn" data-lang="es">🇪🇸 Español</button>
+      <button class="mobile-lang-btn" data-lang="de">🇩🇪 Deutsch</button>
+    </div>
   </nav>
 
   <!-- ══════════════════════════════════════
@@ -536,10 +547,39 @@
     /* === Mobile Nav Toggle === */
     document.getElementById('navToggle').addEventListener('click', () => {
       document.getElementById('navLinks').classList.toggle('open');
+      document.getElementById('mobileLangDropdown').classList.remove('open');
     });
     // Close nav on link click (mobile)
     document.querySelectorAll('.nav-links a').forEach(a => {
       a.addEventListener('click', () => document.getElementById('navLinks').classList.remove('open'));
+    });
+
+    /* === Mobile Language Toggle === */
+    document.getElementById('mobileLangToggle').addEventListener('click', () => {
+      document.getElementById('mobileLangDropdown').classList.toggle('open');
+      document.getElementById('navLinks').classList.remove('open');
+    });
+
+    // Mobile language buttons – reuse same translation logic
+    document.querySelectorAll('.mobile-lang-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentLang = btn.dataset.lang;
+        // Sync active state on both mobile and desktop buttons
+        document.querySelectorAll('.lang-btn, .mobile-lang-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll(`[data-lang="${currentLang}"]`).forEach(b => b.classList.add('active'));
+        // Set direction for Arabic
+        document.documentElement.lang = currentLang;
+        document.body.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+        // Translate
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+          const key = el.getAttribute('data-i18n');
+          if (T[currentLang] && T[currentLang][key]) {
+            el.innerHTML = T[currentLang][key];
+          }
+        });
+        // Close dropdown
+        document.getElementById('mobileLangDropdown').classList.remove('open');
+      });
     });
 
     /* === Scroll Reveal Animation === */
